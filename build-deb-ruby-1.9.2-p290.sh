@@ -7,8 +7,6 @@ destdir=/tmp/install-$rubyversion
 
 sudo apt-get -y install libssl-dev
 
-gem list -i fpm || sudo gem install fpm
-
 if [ ! -f $rubysrc ]; then
   wget -q ftp://ftp.ruby-lang.org/pub/ruby/1.9/$rubysrc
 fi
@@ -24,7 +22,8 @@ cd ruby-$rubyversion
 ./configure --prefix=/usr && make && make install DESTDIR=$destdir
 
 cd ..
-fpm -s dir -t deb -n ruby-$rubyversion -v $rubyversion -C $destdir \
+gem list -i fpm || sudo gem install fpm
+fpm -s dir -t deb -n ruby$version -v $rubyversion -C $destdir \
   -p ruby-VERSION_ARCH.deb -d "libstdc++6 (>= 4.4.3)" \
   -d "libc6 (>= 2.6)" -d "libffi5 (>= 3.0.4)" -d "libgdbm3 (>= 1.8.3)" \
   -d "libncurses5 (>= 5.7)" -d "libreadline6 (>= 6.1)" \
