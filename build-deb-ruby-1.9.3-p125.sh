@@ -5,9 +5,16 @@ rubysrc=ruby-$rubyversion.tar.bz2
 checksum=702529a7f8417ed79f628b77d8061aa5
 destdir=/tmp/install-$rubyversion
 
-sudo apt-get install libssl-dev
+sudo apt-get -y install libssl-dev
 
-gem list -i fpm || sudo gem install fpm
+if [ ! -f yaml-0.1.4.tar.gz ]; then
+  wget -q http://pyyaml.org/download/libyaml/yaml-0.1.4.tar.gz
+fi
+
+tar xzvf yaml-0.1.4.tar.gz
+cd yaml-0.1.4
+./configure --prefix=/usr && make && make install DESTDIR=/tmp/libyaml
+cd ..
 
 if [ ! -f $rubysrc ]; then
   wget -q ftp://ftp.ruby-lang.org/pub/ruby/1.9/$rubysrc
@@ -21,9 +28,10 @@ fi
 echo "Unpacking $rubysrc"
 tar -jxf $rubysrc
 cd ruby-$rubyversion
-./configure --prefix=/usr && make && make install DESTDIR=$destdir
+./configure --prefix=/usr --disable-install-doc --with-opt-dir=/tmp/libyaml/usr && make && make install DESTDIR=$destdir
 
 cd ..
+gem list -i fpm || sudo gem install fpm
 fpm -s dir -t deb -n ruby-$rubyversion -v $rubyversion -C $destdir \
   -p ruby-VERSION_ARCH.deb -d "libstdc++6 (>= 4.4.3)" \
   -d "libc6 (>= 2.6)" -d "libffi5 (>= 3.0.4)" -d "libgdbm3 (>= 1.8.3)" \
@@ -32,3 +40,4 @@ fpm -s dir -t deb -n ruby-$rubyversion -v $rubyversion -C $destdir \
   usr/bin usr/lib usr/share/man usr/include
 
 rm -r $destdir
+rm -r /tmp/libyaml

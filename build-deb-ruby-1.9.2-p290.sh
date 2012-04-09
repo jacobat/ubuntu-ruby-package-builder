@@ -5,7 +5,7 @@ rubysrc=ruby-$rubyversion.tar.bz2
 checksum=096758c3e853b839dc980b183227b182
 destdir=/tmp/install-$rubyversion
 
-sudo apt-get install libssl-dev
+sudo apt-get -y install libssl-dev
 
 gem list -i fpm || sudo gem install fpm
 
