@@ -1,6 +1,8 @@
 #!/bin/sh
 
-rubyversion=1.9.3-p125
+version=1.9.3
+patch=p125
+rubyversion=$version-$patch
 rubysrc=ruby-$rubyversion.tar.bz2
 checksum=702529a7f8417ed79f628b77d8061aa5
 destdir=/tmp/install-$rubyversion
@@ -13,7 +15,7 @@ fi
 
 tar xzvf yaml-0.1.4.tar.gz
 cd yaml-0.1.4
-./configure --prefix=/usr && make && make install DESTDIR=/tmp/libyaml
+./configure --prefix=/usr && make && make install DESTDIR=$destdir
 cd ..
 
 if [ ! -f $rubysrc ]; then
@@ -32,7 +34,7 @@ cd ruby-$rubyversion
 
 cd ..
 gem list -i fpm || sudo gem install fpm
-fpm -s dir -t deb -n ruby-$rubyversion -v $rubyversion -C $destdir \
+fpm -s dir -t deb -n ruby$version -v $rubyversion -C $destdir \
   -p ruby-VERSION_ARCH.deb -d "libstdc++6 (>= 4.4.3)" \
   -d "libc6 (>= 2.6)" -d "libffi5 (>= 3.0.4)" -d "libgdbm3 (>= 1.8.3)" \
   -d "libncurses5 (>= 5.7)" -d "libreadline6 (>= 6.1)" \
@@ -40,4 +42,3 @@ fpm -s dir -t deb -n ruby-$rubyversion -v $rubyversion -C $destdir \
   usr/bin usr/lib usr/share/man usr/include
 
 rm -r $destdir
-rm -r /tmp/libyaml
